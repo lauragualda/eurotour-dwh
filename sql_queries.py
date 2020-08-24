@@ -346,11 +346,23 @@ FROM staging_attractions a
 JOIN cities c ON lower(a.location) = c.city_name
 """)
 
-# QUERY LISTS
+# QUERIES LISTS
 
 create_table_queries = [staging_listings_create, staging_reviews_create, staging_restaurants_create, staging_attractions_create, 
                         airbnb_listings_create, airbnb_reviews_create, airbnb_hosts_create, cities_create, restaurants_create, attractions_create]
+
 drop_table_queries = [staging_listings_drop, staging_reviews_drop, staging_restaurants_drop, staging_attractions_drop,
                       airbnb_listings_drop, airbnb_reviews_drop, airbnb_hosts_drop, cities_drop, restaurants_drop, attractions_drop]
+
 copy_table_queries = [staging_listings_copy, staging_reviews_copy, staging_restaurants_copy, staging_attractions_copy]
+
 insert_table_queries = [cities_insert, airbnb_listings_insert, airbnb_hosts_insert, airbnb_reviews_insert, restaurants_insert, attractions_insert]
+
+data_quality_queries = {'cities': "SELECT COUNT(*) FROM cities WHERE city_id is null",
+                      'airbnb_listings': "SELECT COUNT(*) FROM cities WHERE listing_id is null",
+                      'airbnb_hosts': "SELECT COUNT(*) FROM cities WHERE host_id is null",
+                      'airbnb_reviews': "SELECT COUNT(*) FROM cities WHERE review_id is null",
+                      'restaurants': "SELECT COUNT(*) FROM cities WHERE restaurant_id is null",
+                      'attractions': "SELECT COUNT(*) FROM cities WHERE attraction_id is null"
+                    }
+

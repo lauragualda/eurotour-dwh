@@ -44,22 +44,30 @@ The DWH consists of 6 tables in normal form such that it avoids redundancy and f
 
 You can check the dictionary of the variables in each table here: [data_dictionary.pdf](docs/data_dictionary.pdf)
 
-### DWH technology
+### Tools and Technologies
 
-Amazon Redshift is chosen as staging environment and as cloud Data Warehouse for three reasons: 
+#### 1. Why a Data Warehouse and not a Data lake
+In particular for this project, the schema requested by Data Science and Analytics purposes has only structured data with a clear schema, therefore a Data Lake is not a must. 
+
+#### 2. Amazon Redshift
+Was chosen as staging environment and as cloud Data Warehouse for three reasons: 
+- It can be easily queried with industry-standard SQL (Postgres) by Analysts and Data Scientists
 - It can handle all the data transformations required to process raw data into the desired data model and it is highly scalable
 - It's convenient for high volumes of data, as one can add and remove cluster nodes according to the needs with an accessible price
-- It can be easily queried with industry-standard SQL (Postgres)
+
+#### 3. Python
+The ETL for this project was developed as a proof of concept in the form of Python scripts, since for now, it will be executed only once and is still subject to changes. In the future, when we have a better understanding of how often the DWH will be updated and a consolidated version of the pipeline, it makes sense to migrate it to an Airflow dag.
 
 ### ETL
 
-The ETL pipeline developed for this project is a proof of concept and was written for now of 3 Python scripts:
+The ETL pipeline consits for now of 4 Python scripts:
 
   * `sql_queries.py` - Collection of SQL queries to drop, create and insert records into the staging tables and DWH databases
   * `create_tables.py` - Sequential commands to create staging tables and DWH tables
   * `etl.py` - ETL processes that extract raw data from s3, loads into staging tables on Redshift and loads relevant data into the 6 DWH tables (described on the Data Model section)
+  * `data_quality.py`- Data quality checks to be executed after the ETL pipeline to verify that data was inserted correctly into thw DWH tables.
 
-#### How to execute it
+#### Executing it
 Download or clone this repository and make sure you run the following commands from inside your local directory where you saved it.
 
 1. Add your AWS key and secret to `dwh.cfg`
@@ -78,6 +86,12 @@ python create_tables.py
 python etl.py
 ```
 
+5. Verify data quality on DWH tables:
+
+```python
+python data_quality.py
+```
+
 ## Addressing other scenarios
 
 1. If the data was increased by 100x
@@ -90,6 +104,7 @@ Assuming that the new data would be already on s3, the ETL should be rewritten a
 
 3. If the database needed to be accessed by 100+ people
 
-Redshift would not have a problem if 100+ people had to access the database, we would just have to scale up/down the cluster nodes accordingly. 
+If 100+ people had to access the database, we would probably need more CPU resources to support a fast experience for all the users. In this sense we could improve
+the replications and how the data is partitioned to get faster query results for each user
 
-Once there's a better understanding of queries and use cases of the data warehouse, the data model, including sort and dist keys can be adapted to make the access more efficient to each user.
+For example, once there's a better understanding of queries and use cases, the data model, including sort and dist keys can be adapted to make the access more efficient for each user.
